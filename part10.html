@@ -19,7 +19,7 @@ class MainScene extends Phaser.Scene {
         super('MainScene');
     }
     preload() {
-        this.load.image('sky', 'assets/sky.png');
+        this.load.image('sky', 'assets/background.png');
         this.load.image('ground', 'assets/platform.png');
         this.load.image('star', 'assets/star.png');
         this.load.image('bomb', 'assets/bomb.png');
@@ -27,7 +27,7 @@ class MainScene extends Phaser.Scene {
     }
     create() {
         //  A simple background for our game
-        this.add.image(400, 300, 'sky');
+        this.add.image(0, 0, 'sky');
 
         //  The platforms group contains the ground and the 2 ledges we can jump on
         platforms = this.physics.add.staticGroup();
@@ -85,7 +85,7 @@ class MainScene extends Phaser.Scene {
         stars.children.iterate(function (child) {
 
             //  Give each star a slightly different bounce
-            child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+            child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
 
         });
 
@@ -146,7 +146,7 @@ class SecondScene extends Phaser.Scene {
         super('SecondScene');
     }
     preload() {
-        this.load.image('sky', 'assets/sky.png');
+        this.load.image('sky', 'assets/background.png');
         this.load.image('ground', 'assets/platform.png');
         this.load.image('star', 'assets/star.png');
         this.load.image('bomb', 'assets/bomb.png');
@@ -154,7 +154,7 @@ class SecondScene extends Phaser.Scene {
     }
     create() {
         //  A simple background for our game
-        this.add.image(400, 300, 'sky');
+        this.add.image(0, 0, 'sky');
 
         //  The platforms group contains the ground and the 2 ledges we can jump on
         platforms = this.physics.add.staticGroup();
@@ -210,7 +210,7 @@ class SecondScene extends Phaser.Scene {
         stars.children.iterate(function (child) {
 
             //  Give each star a slightly different bounce
-            child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+            child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
 
         });
 
