@@ -21,8 +21,9 @@ class MainScene extends Phaser.Scene {
     preload() {
         this.load.image('sky', 'assets/background.png');
         this.load.image('ground', 'assets/platform.png');
-        this.load.image('star', 'assets/star.png');
+        this.load.image('star', 'assets/petr.png');
         this.load.image('bomb', 'assets/bomb.png');
+        this.load.image('tree', 'assets/tree.png');
         this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 540, frameHeight: 216 });
     }
     create() {
@@ -37,11 +38,26 @@ class MainScene extends Phaser.Scene {
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
         //  Now let's create some ledges
+        /*
+        platforms.create(300, 400, 'ground');
+        platforms.create(100, 50, 'ground');
+        platforms.create(750, 220, 'ground');
+*/
+
+        // Adding trees as obstacles
         for (let i = 0; i < 3; i++) {
+            const treeX = Phaser.Math.Between(50, 750);
+            const treeY = 545;
+            this.add.image(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5, 1);
+        }
+
+        
+        for (let i = 0; i < 2; i++) {
             const ledgeX = Phaser.Math.Between(50, 750);
             const ledgeY = Phaser.Math.Between(50, 400);
             platforms.create(ledgeX, ledgeY, 'ground');
         }
+        
 
         // The player and its settings
         player = this.physics.add.sprite(100, 450, 'dude');
@@ -77,17 +93,16 @@ class MainScene extends Phaser.Scene {
 
         //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
         stars = this.physics.add.group({
-            key: 'star',
-            repeat: 11,
-            setXY: { x: 12, y: 0, stepX: 70 }
-        });
+    key: 'star',
+    repeat: 11,
+    setXY: { x: 12, y: 0, stepX: 70 }
+});
 
-        stars.children.iterate(function (child) {
+stars.children.iterate(function (child) {
+    child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
+    child.setScale(0.1);  // 👈 Add this line to shrink the star
+});
 
-            //  Give each star a slightly different bounce
-            child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
-
-        });
 
         bombs = this.physics.add.group();
 
@@ -148,7 +163,7 @@ class SecondScene extends Phaser.Scene {
     preload() {
         this.load.image('sky', 'assets/background.png');
         this.load.image('ground', 'assets/platform.png');
-        this.load.image('star', 'assets/star.png');
+        this.load.image('star', 'assets/petr.png');
         this.load.image('bomb', 'assets/bomb.png');
         this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 540, frameHeight: 216 });
     }
@@ -163,10 +178,19 @@ class SecondScene extends Phaser.Scene {
         //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
+        // Adding trees as obstacles
+        for (let i = 0; i < 3; i++) {
+            const treeX = Phaser.Math.Between(50, 750);
+            const treeY = 545;
+            this.add.image(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5, 1);
+        }
+
         //  Now let's create some ledges
-        platforms.create(300, 400, 'ground');
-        platforms.create(100, 50, 'ground');
-        platforms.create(750, 220, 'ground');
+        for (let i = 0; i < 2; i++) {
+            const ledgeX = Phaser.Math.Between(50, 750);
+            const ledgeY = Phaser.Math.Between(50, 400);
+            platforms.create(ledgeX, ledgeY, 'ground');
+        }
 
         // The player and its settings
         player = this.physics.add.sprite(100, 450, 'dude');
@@ -202,27 +226,27 @@ class SecondScene extends Phaser.Scene {
 
         //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
         stars = this.physics.add.group({
-            key: 'star',
-            repeat: 11,
-            setXY: { x: 12, y: 0, stepX: 70 }
-        });
+    key: 'star',
+    repeat: 11,
+    setXY: { x: 12, y: 0, stepX: 70 }
+});
 
-        stars.children.iterate(function (child) {
+stars.children.iterate(function (child) {
+    child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
+    child.setScale(0.1);  // 👈 Add this line to shrink the star
+});
 
-            //  Give each star a slightly different bounce
-            child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
-
-        });
 
         bombs = this.physics.add.group();
 
         //  The score
-        scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+        scoreText = this.add.text(16, 16, 'score: ' + score, { fontSize: '32px', fill: '#000' });
 
         //  Collide the player and the stars with the platforms
         this.physics.add.collider(player, platforms);
         this.physics.add.collider(stars, platforms);
         this.physics.add.collider(bombs, platforms);
+        
 
         //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
         this.physics.add.overlap(player, stars, collectStar, null, this);
@@ -260,7 +284,7 @@ class SecondScene extends Phaser.Scene {
         }
         // Example: Switch to next scene if player reaches right edge
         if (player.x > 680) {
-            this.scene.start('SecondScene');
+            this.scene.start('SecondScene', { score: score });
         }
     }
 }
