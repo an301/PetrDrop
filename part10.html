@@ -48,13 +48,17 @@ class MainScene extends Phaser.Scene {
         for (let i = 0; i < 3; i++) {
             const treeX = Phaser.Math.Between(50, 750);
             const treeY = 545;
-            this.add.image(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5, 1);
+            //this.add.image(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5, 1);
+            // should be make the trees such that they can be jumped on
+            platforms.create(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5,1).refreshBody();
         }
+
+        
 
         
         for (let i = 0; i < 2; i++) {
             const ledgeX = Phaser.Math.Between(50, 750);
-            const ledgeY = Phaser.Math.Between(50, 400);
+            const ledgeY = Phaser.Math.Between(100, 400);
             platforms.create(ledgeX, ledgeY, 'ground');
         }
         
@@ -182,13 +186,14 @@ class SecondScene extends Phaser.Scene {
         for (let i = 0; i < 3; i++) {
             const treeX = Phaser.Math.Between(50, 750);
             const treeY = 545;
-            this.add.image(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5, 1);
+            //this.add.image(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5, 1);
+            platforms.create(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5,1).refreshBody();
         }
 
         //  Now let's create some ledges
         for (let i = 0; i < 2; i++) {
             const ledgeX = Phaser.Math.Between(50, 750);
-            const ledgeY = Phaser.Math.Between(50, 400);
+            const ledgeY = Phaser.Math.Between(100, 400);
             platforms.create(ledgeX, ledgeY, 'ground');
         }
 
