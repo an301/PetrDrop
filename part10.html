@@ -53,14 +53,14 @@ class MainScene extends Phaser.Scene {
             platforms.create(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5,1).refreshBody();
         }
 
-        
-
-        
-        for (let i = 0; i < 2; i++) {
-            const ledgeX = Phaser.Math.Between(50, 750);
-            const ledgeY = Phaser.Math.Between(100, 400);
-            platforms.create(ledgeX, ledgeY, 'ground');
-        }
+        // ledgeOne
+        const firstX = Phaser.Math.Between(0, 750);
+        const firstY = Phaser.Math.Between(300, 400);
+        platforms.create(firstX, firstY, 'ground');
+        // ledgeTwo
+        const secondX = Phaser.Math.Between(50, 750);
+        const secondY = Phaser.Math.Between(100, 250);
+        platforms.create(secondX, secondY, 'ground');
         
 
         // The player and its settings
@@ -169,6 +169,7 @@ class SecondScene extends Phaser.Scene {
         this.load.image('ground', 'assets/platform.png');
         this.load.image('star', 'assets/petr.png');
         this.load.image('bomb', 'assets/bomb.png');
+        this.load.image('tree', 'assets/tree.png');
         this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 540, frameHeight: 216 });
     }
     create() {
@@ -190,12 +191,17 @@ class SecondScene extends Phaser.Scene {
             platforms.create(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5,1).refreshBody();
         }
 
-        //  Now let's create some ledges
-        for (let i = 0; i < 2; i++) {
-            const ledgeX = Phaser.Math.Between(50, 750);
-            const ledgeY = Phaser.Math.Between(100, 400);
-            platforms.create(ledgeX, ledgeY, 'ground');
-        }
+        
+        // ledgeOne
+        const firstX = Phaser.Math.Between(0, 750);
+        const firstY = Phaser.Math.Between(300, 400);
+        platforms.create(firstX, firstY, 'ground');
+        // ledgeTwo
+        const secondX = Phaser.Math.Between(50, 750);
+        const secondY = Phaser.Math.Between(100, 250);
+        console.log(`Second Ledge Position: (${secondX}, ${secondY})`);
+        platforms.create(secondX, secondY, 'ground');
+
 
         // The player and its settings
         player = this.physics.add.sprite(100, 450, 'dude');
