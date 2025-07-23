@@ -48,9 +48,14 @@ class MainScene extends Phaser.Scene {
         for (let i = 0; i < 3; i++) {
             const treeX = Phaser.Math.Between(50, 750);
             const treeY = 545;
-            //this.add.image(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5, 1);
-            // should be make the trees such that they can be jumped on
-            platforms.create(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5,1).refreshBody();
+            // this makes the tree visible, but won't be in the way of the player
+            this.add.image(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5, 1);
+            // area where the smaller section of the tree can be interacted with by the player (where they can jump on it)
+            const treePlatform = this.physics.add.staticImage(treeX, treeY - 100, null).setSize(0.5,0.5).refreshBody();
+            // makes the block/platform for the tree invisible but still allows the player to interact with it
+            treePlatform.setVisible(false);
+            // now adding the platform to the static group
+            platforms.add(treePlatform);
         }
 
         // ledgeOne
@@ -187,8 +192,14 @@ class SecondScene extends Phaser.Scene {
         for (let i = 0; i < 3; i++) {
             const treeX = Phaser.Math.Between(50, 750);
             const treeY = 545;
-            //this.add.image(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5, 1);
-            platforms.create(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5,1).refreshBody();
+            // this makes the tree visible, but won't be in the way of the player
+            this.add.image(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5, 1);
+            // area where the smaller section of the tree can be interacted with by the player (where they can jump on it)
+            const treePlatform = this.physics.add.staticImage(treeX, treeY - 100, null).setSize(0.5,0.5).refreshBody();
+            // makes the block/platform for the tree invisible but still allows the player to interact with it
+            treePlatform.setVisible(false);
+            // now adding the platform to the static group
+            platforms.add(treePlatform);
         }
 
         
@@ -359,6 +370,5 @@ function hitBomb (player, bomb)
 }
 
 </script>
-
 </body>
 </html>
