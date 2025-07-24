@@ -41,7 +41,7 @@ class MainScene extends Phaser.Scene {
     this.load.image("sky", "assets/background.png");
     this.load.image("ground", "assets/platform.png");
     this.load.image("star", "assets/petr.png");
-    this.load.image("bomb", "assets/bomb.png");
+    this.load.image("enemy", "assets/enemy.png");
     this.load.image("tree", "assets/tree.png");
     this.load.spritesheet("dude", "assets/dude.png", {
       frameWidth: 540,
@@ -131,7 +131,7 @@ class MainScene extends Phaser.Scene {
       child.setScale(0.1); // 👈 Add this line to shrink the star
     });
 
-    bombs = this.physics.add.group();
+    enemies = this.physics.add.group();
 
     //  The score
     scoreText = this.add.text(16, 16, "score: 0", {
@@ -152,12 +152,12 @@ class MainScene extends Phaser.Scene {
     //  Collide the player and the stars with the platforms
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(stars, platforms);
-    this.physics.add.collider(bombs, platforms);
+    this.physics.add.collider(enemies, platforms);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     this.physics.add.overlap(player, stars, collectStar, null, this);
 
-    this.physics.add.collider(player, bombs, hitBomb, null, this);
+    this.physics.add.collider(player, enemies, hitEnemy, null, this);
   }
   update() {
     if (gameOver) {
@@ -200,7 +200,7 @@ class SecondScene extends Phaser.Scene {
     this.load.image("sky", "assets/background.png");
     this.load.image("ground", "assets/platform.png");
     this.load.image("star", "assets/petr.png");
-    this.load.image("bomb", "assets/bomb.png");
+    this.load.image("enemy", "assets/enemy.png");
     this.load.spritesheet("dude", "assets/dude.png", {
       frameWidth: 540,
       frameHeight: 216,
@@ -290,7 +290,7 @@ class SecondScene extends Phaser.Scene {
       child.setScale(0.1); // 👈 Add this line to shrink the star
     });
 
-    bombs = this.physics.add.group();
+    enemies = this.physics.add.group();
 
     //  The score
     scoreText = this.add.text(16, 16, "score: " + score, {
@@ -310,12 +310,12 @@ class SecondScene extends Phaser.Scene {
     //  Collide the player and the stars with the platforms
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(stars, platforms);
-    this.physics.add.collider(bombs, platforms);
+    this.physics.add.collider(enemies, platforms);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
     this.physics.add.overlap(player, stars, collectStar, null, this);
 
-    this.physics.add.collider(player, bombs, hitBomb, null, this);
+    this.physics.add.collider(player, enemies, hitEnemy, null, this);
   }
   update() {
     if (gameOver) {
@@ -362,10 +362,11 @@ var config = {
 // Global variables
 var player;
 var stars;
-var bombs;
+var enemies;
 var platforms;
 var cursors;
 var score = 0;
+var scoreEnemy = 0;
 var gameOver = false;
 var scoreText;
 var timerText;
@@ -571,6 +572,7 @@ function collectStar(player, star) {
 
   //  Add and update the score
   score += 10;
+  scoreEnemy += 10;
   scoreText.setText("Score: " + score);
 
   // Check if player has reached 500 points to show win screen
@@ -592,8 +594,10 @@ function collectStar(player, star) {
     return;
   }
 
-  if (stars.countActive(true) === 0) {
+  if (scoreEnemy == 100) {
     //  A new batch of stars to collect
+    scoreEnemy = 0;
+
     stars.children.iterate(function (child) {
       child.enableBody(true, child.x, 0, true, true);
     });
@@ -603,15 +607,17 @@ function collectStar(player, star) {
         ? Phaser.Math.Between(400, 800)
         : Phaser.Math.Between(0, 400);
 
-    var bomb = bombs.create(x, 16, "bomb");
-    bomb.setBounce(1);
-    bomb.setCollideWorldBounds(true);
-    bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-    bomb.allowGravity = false;
+    var enemy = enemies.create(x, 16, "enemy").setScale(0.08);
+    enemy.setSize(700, 1300);        // tweak to match visual size
+    enemy.setOffset(900, 270);      // aligns the hitbox with sprite
+    enemy.setBounce(1);
+    enemy.setCollideWorldBounds(true);
+    enemy.setVelocity(Phaser.Math.Between(-200, 200), 20);
+    enemy.allowGravity = true;
   }
 }
 
-function hitBomb(player, bomb) {
+function hitEnemy(player, enemy) {
   this.physics.pause();
 
   player.setTint(0xff0000);
