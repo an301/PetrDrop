@@ -119,11 +119,11 @@ class MainScene extends Phaser.Scene {
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
 
-    //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
+    //  Some stars to collect, 8 in total, evenly spaced 90 pixels apart along the x axis
     stars = this.physics.add.group({
       key: "star",
-      repeat: 11,
-      setXY: { x: 12, y: 0, stepX: 70 },
+      repeat: 7,
+      setXY: { x: 40, y: 0, stepX: 100 },
     });
 
     stars.children.iterate(function (child) {
@@ -278,11 +278,11 @@ class SecondScene extends Phaser.Scene {
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
 
-    //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
+    //  Some stars to collect, 8 in total, evenly spaced 90 pixels apart along the x axis
     stars = this.physics.add.group({
       key: "star",
-      repeat: 11,
-      setXY: { x: 12, y: 0, stepX: 70 },
+      repeat: 7,
+      setXY: { x: 40, y: 0, stepX: 100 },
     });
 
     stars.children.iterate(function (child) {
