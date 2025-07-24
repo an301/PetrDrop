@@ -81,7 +81,7 @@ PetrDrop/
 
 ### 💡 Author
 
-Made with by Kaelyn Sung, 
+Made with by Kaelyn Sung, Sanaa Bebal, 
 
 ---
 
