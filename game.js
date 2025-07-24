@@ -371,13 +371,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const menuToggle = document.getElementById('menu-toggle');
     const menuContent = document.getElementById('menu-content');
     const viewCollectionBtn = document.getElementById('view-collection-btn');
-    const pauseBtn = document.getElementById('pause-btn');
     const restartBtn = document.getElementById('restart-btn');
     const collectionModal = document.getElementById('collection-modal');
     const closeCollection = document.getElementById('close-collection');
     
     let isMenuOpen = false;
-    let isGamePaused = false;
 
     // Menu toggle functionality
     menuToggle.addEventListener('click', function() {
@@ -426,23 +424,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Pause functionality
-    pauseBtn.addEventListener('click', function() {
-        if (!isGamePaused) {
-            game.scene.pause();
-            pauseBtn.textContent = '▶️ Resume';
-            isGamePaused = true;
-        } else {
-            game.scene.resume();
-            pauseBtn.textContent = '⏸️ Pause';
-            isGamePaused = false;
-        }
-        
-        // Close menu
-        isMenuOpen = false;
-        menuContent.classList.remove('menu-visible');
-        menuContent.classList.add('menu-hidden');
-    });
 
     // Restart functionality
     restartBtn.addEventListener('click', function() {
@@ -463,14 +444,15 @@ document.addEventListener('DOMContentLoaded', function() {
             // Reset timer after scene starts
             setTimeout(() => {
                 resetTimer();
+                // Reset cursor keys to prevent auto-movement
+                if (cursors) {
+                    cursors.left.isDown = false;
+                    cursors.right.isDown = false;
+                    cursors.up.isDown = false;
+                }
             }, 50);
         }, 100);
         
-        // Reset pause state
-        if (isGamePaused) {
-            pauseBtn.textContent = '⏸️ Pause';
-            isGamePaused = false;
-        }
         
         // Close menu
         isMenuOpen = false;
