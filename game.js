@@ -41,6 +41,10 @@ class MainScene extends Phaser.Scene {
     this.load.image("sky", "assets/background.png");
     this.load.image("ground", "assets/platform.png");
     this.load.image("star", "assets/petr.png");
+    // rare petrs
+    this.load.image("rare_one", "assets/bobapetr.png");
+    this.load.image("rare_two", "assets/pickleballpetr.png");
+    this.load.image("rare_three", "assets/schoolspiritpetr.png");
     this.load.image("enemy", "assets/enemy.png");
     this.load.image("tree", "assets/tree.png");
     this.load.spritesheet("dude", "assets/dude.png", {
@@ -119,17 +123,49 @@ class MainScene extends Phaser.Scene {
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
 
-    //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
+    /*
+    //  Some stars to collect, 8 in total, evenly spaced 90 pixels apart along the x axis
     stars = this.physics.add.group({
       key: "star",
-      repeat: 11,
-      setXY: { x: 12, y: 0, stepX: 70 },
+      repeat: 7,
+      setXY: { x: 40, y: 0, stepX: 100 },
     });
+    */
 
-    stars.children.iterate(function (child) {
-      child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
-      child.setScale(0.1); // 👈 Add this line to shrink the star
-    });
+    // to generate also rare petrs
+    const starTypes = ["star", "rare_one", "rare_two", "rare_three"];
+    stars = this.physics.add.group();
+
+    for (let i = 0; i < 8; i++){
+      const x = Phaser.Math.Between(50, 750);
+      const y = 0;
+
+      let typePetr = "star"; // default is the common petr
+      
+      const chance = Phaser.Math.FloatBetween(0,1);
+      if (chance < 0.15){
+        typePetr = "rare_one";
+      } else if (chance < 0.18){
+        typePetr = "rare_two";
+      } else if (chance < 0.18){
+        typePetr = "rare_three";
+      }
+
+      const selectedPetr = stars.create(x, y, typePetr);
+      selectedPetr.setBounceY(Phaser.Math.FloatBetween(0.2,0.4));
+      if (typePetr == "star"){
+        selectedPetr.setScale(0.1);
+      } else if (typePetr == "rare_one") {
+        selectedPetr.setScale(0.15);
+      } else {
+        selectedPetr.setScale(0.15);
+      }
+    }
+
+    // stars.children.iterate(function (child) {
+    //   child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
+    //   child.setScale(0.1); // 👈 Add this line to shrink the star
+    // });
 
     enemies = this.physics.add.group();
 
@@ -200,6 +236,10 @@ class SecondScene extends Phaser.Scene {
     this.load.image("sky", "assets/background.png");
     this.load.image("ground", "assets/platform.png");
     this.load.image("star", "assets/petr.png");
+    // rare petrs
+    this.load.image("rare_one", "assets/bobapetr.png");
+    this.load.image("rare_two", "assets/pickleballpetr.png");
+    this.load.image("rare_three", "assets/schoolspiritpetr.png");
     this.load.image("enemy", "assets/enemy.png");
     this.load.spritesheet("dude", "assets/dude.png", {
       frameWidth: 540,
@@ -278,17 +318,49 @@ class SecondScene extends Phaser.Scene {
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
 
-    //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
+    /*
+    //  Some stars to collect, 8 in total, evenly spaced 90 pixels apart along the x axis
     stars = this.physics.add.group({
       key: "star",
-      repeat: 11,
-      setXY: { x: 12, y: 0, stepX: 70 },
+      repeat: 7,
+      setXY: { x: 40, y: 0, stepX: 100 },
     });
 
     stars.children.iterate(function (child) {
       child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
       child.setScale(0.1); // 👈 Add this line to shrink the star
     });
+    */
+
+    // to generate also rare petrs
+    const starTypes = ["star", "rare_one", "rare_two", "rare_three"];
+    stars = this.physics.add.group();
+
+    for (let i = 0; i < 8; i++){
+      const x = Phaser.Math.Between(50, 750);
+      const y = 0;
+
+      let typePetr = "star"; // default is the common petr
+      
+      const chance = Phaser.Math.FloatBetween(0,1);
+      if (chance < 0.15){
+        typePetr = "rare_one";
+      } else if (chance < 0.18){
+        typePetr = "rare_two";
+      } else if (chance < 0.18){
+        typePetr = "rare_three";
+      }
+
+      const selectedPetr = stars.create(x, y, typePetr);
+      selectedPetr.setBounceY(Phaser.Math.FloatBetween(0.2,0.4));
+      if (typePetr == "star"){
+        selectedPetr.setScale(0.1);
+      } else if (typePetr == "rare_one") {
+        selectedPetr.setScale(0.15);
+      } else {
+        selectedPetr.setScale(0.15);
+      }
+    }
 
     enemies = this.physics.add.group();
 
@@ -394,8 +466,8 @@ function updateGameTimer() {
       timerText.setText("Time: " + formatTime(gameTime));
     }
 
-    // Check if 2 minutes (120 seconds) have passed without reaching 500 points
-    if (gameTime >= 120 && score < 500 && completionTime === null) {
+    // Check if 1.5 minutes (90 seconds) have passed without reaching 500 points
+    if (gameTime >= 90 && score < 500 && completionTime === null) {
       // Set game over to prevent further updates
       gameOver = true;
 
@@ -565,14 +637,21 @@ function addPetrToCollection() {
 
 // Game functions
 function collectStar(player, star) {
+  const type = star.texture.key;
   star.disableBody(true, true);
 
   //  Add to collection tracking
   addPetrToCollection();
 
+  // default
+  let points = 10;
+  if (type == "rare_one") points = 25;
+  else if (type == "rare_two") points = 30;
+  else if (type == "rare_three") points = 50;
+
   //  Add and update the score
-  score += 10;
-  scoreEnemy += 10;
+  score += points;
+  scoreEnemy += points;
   scoreText.setText("Score: " + score);
 
   // Check if player has reached 500 points to show win screen
