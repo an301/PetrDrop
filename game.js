@@ -394,8 +394,8 @@ function updateGameTimer() {
       timerText.setText("Time: " + formatTime(gameTime));
     }
 
-    // Check if 2 minutes (120 seconds) have passed without reaching 500 points
-    if (gameTime >= 120 && score < 500 && completionTime === null) {
+    // Check if 1.5 minutes (90 seconds) have passed without reaching 500 points
+    if (gameTime >= 90 && score < 500 && completionTime === null) {
       // Set game over to prevent further updates
       gameOver = true;
 
