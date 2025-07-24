@@ -16,7 +16,7 @@ class StartScene extends Phaser.Scene {
         bg.displayWidth = this.sys.game.config.width;
         bg.displayHeight = this.sys.game.config.height;
 
-        // Option 2 (if no image): use plain text as button
+        // use plain text as button
          const startText = this.add.text(400, 500, 'START', { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
          startText.setInteractive();
          startText.on('pointerdown', () => {
@@ -39,7 +39,7 @@ class MainScene extends Phaser.Scene {
         this.load.image('sky', 'assets/background.png');
         this.load.image('ground', 'assets/platform.png');
         this.load.image('star', 'assets/petr.png');
-        this.load.image('bomb', 'assets/bomb.png');
+        this.load.image('enemy', 'assets/enemy.png');
         this.load.image('tree', 'assets/tree.png');
         this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 540, frameHeight: 216 });
     }
@@ -70,7 +70,7 @@ class MainScene extends Phaser.Scene {
         // Improved ledge generation to prevent same-level placement
         // ledgeOne
         const firstX = Phaser.Math.Between(0, 750);
-        const firstY = Phaser.Math.Between(300, 400);
+        const firstY = Phaser.Math.Between(300, 350);
         platforms.create(firstX, firstY, 'ground');
         // ledgeTwo  
         const secondX = Phaser.Math.Between(50, 750);
@@ -123,7 +123,7 @@ stars.children.iterate(function (child) {
     child.setScale(0.1);  // 👈 Add this line to shrink the star
 });
 
-        bombs = this.physics.add.group();
+        enemies = this.physics.add.group();
 
         //  The score
         scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
@@ -138,12 +138,12 @@ stars.children.iterate(function (child) {
         //  Collide the player and the stars with the platforms
         this.physics.add.collider(player, platforms);
         this.physics.add.collider(stars, platforms);
-        this.physics.add.collider(bombs, platforms);
+        this.physics.add.collider(enemies, platforms);
 
         //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
         this.physics.add.overlap(player, stars, collectStar, null, this);
 
-        this.physics.add.collider(player, bombs, hitBomb, null, this);
+        this.physics.add.collider(player, enemies, hitEnemy, null, this);
     }
     update() {
         if (gameOver)
@@ -193,7 +193,7 @@ class SecondScene extends Phaser.Scene {
         this.load.image('sky', 'assets/background.png');
         this.load.image('ground', 'assets/platform.png');
         this.load.image('star', 'assets/petr.png');
-        this.load.image('bomb', 'assets/bomb.png');
+        this.load.image('enemy', 'assets/enemy.png');
         this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 540, frameHeight: 216 });
     }
     create() {
@@ -224,7 +224,7 @@ class SecondScene extends Phaser.Scene {
         // Improved ledge generation to prevent same-level placement
         // ledgeOne
         const firstX = Phaser.Math.Between(0, 750);
-        const firstY = Phaser.Math.Between(300, 400);
+        const firstY = Phaser.Math.Between(300, 350);
         platforms.create(firstX, firstY, 'ground');
         // ledgeTwo  
         const secondX = Phaser.Math.Between(50, 750);
@@ -278,7 +278,7 @@ stars.children.iterate(function (child) {
 });
 
 
-        bombs = this.physics.add.group();
+        enemies = this.physics.add.group();
 
         //  The score
         scoreText = this.add.text(16, 16, 'score: ' + score, { fontSize: '32px', fill: '#000' });
@@ -290,13 +290,13 @@ stars.children.iterate(function (child) {
         //  Collide the player and the stars with the platforms
         this.physics.add.collider(player, platforms);
         this.physics.add.collider(stars, platforms);
-        this.physics.add.collider(bombs, platforms);
+        this.physics.add.collider(enemies, platforms);
         
 
         //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
         this.physics.add.overlap(player, stars, collectStar, null, this);
 
-        this.physics.add.collider(player, bombs, hitBomb, null, this);
+        this.physics.add.collider(player, enemies, hitEnemy, null, this);
     }
     update() {
         if (gameOver)
@@ -343,17 +343,18 @@ var config = {
     width: 800,
     height: 600,
     parent: 'game-container',
-    physics: { default: 'arcade', arcade: { gravity: { y: 300 }, debug: false } },
+    physics: { default: 'arcade', arcade: { gravity: { y: 300 }, debug: true } },
     scene: [StartScene, MainScene, SecondScene]
 };
 
 // Global variables
 var player;
 var stars;
-var bombs;
+var enemies;
 var platforms;
 var cursors;
 var score = 0;
+var scoreEnemy = 0;
 var gameOver = false;
 var scoreText;
 var timerText;
@@ -544,10 +545,12 @@ function collectStar (player, star)
 
     //  Add and update the score
     score += 10;
+    scoreEnemy += 10;
     scoreText.setText('Score: ' + score);
 
-    if (stars.countActive(true) === 0)
+    if (scoreEnemy == 100)//(stars.countActive(true) === 0)
     {
+        scoreEnemy = 0;
         //  A new batch of stars to collect
         stars.children.iterate(function (child) {
 
@@ -557,16 +560,17 @@ function collectStar (player, star)
 
         var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
 
-        var bomb = bombs.create(x, 16, 'bomb');
-        bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-        bomb.allowGravity = false;
-
+        var enemy = enemies.create(x, 16, 'enemy').setScale(0.08);
+        enemy.setSize(700, 1300);        // 👈 tweak to match visual size
+        enemy.setOffset(900, 270);      // 👈 optional: aligns the hitbox with sprite
+        enemy.setBounce(1);
+        enemy.setCollideWorldBounds(true);
+        enemy.setVelocity(Phaser.Math.Between(-200, 200), 20);
+        enemy.allowGravity = true;
     }
 }
 
-function hitBomb (player, bomb)
+function hitEnemy (player, enemy)
 {
     this.physics.pause();
 
