@@ -82,7 +82,7 @@ class MainScene extends Phaser.Scene {
     platforms.create(firstX, firstY, "ground");
     // ledgeTwo
     const secondX = Phaser.Math.Between(50, 750);
-    const secondY = Phaser.Math.Between(100, 250);
+    const secondY = Phaser.Math.Between(150, 250);
     platforms.create(secondX, secondY, "ground");
 
     // The player and its settings
@@ -241,7 +241,7 @@ class SecondScene extends Phaser.Scene {
     platforms.create(firstX, firstY, "ground");
     // ledgeTwo
     const secondX = Phaser.Math.Between(50, 750);
-    const secondY = Phaser.Math.Between(100, 250);
+    const secondY = Phaser.Math.Between(150, 250);
     platforms.create(secondX, secondY, "ground");
 
     // The player and its settings
