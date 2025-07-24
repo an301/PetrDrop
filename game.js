@@ -14,7 +14,7 @@ class MainScene extends Phaser.Scene {
     }
     create() {
         //  A simple background for our game
-        this.add.image(400, 300, 'sky');
+        this.add.image(0, 0, 'sky');
 
         //  The platforms group contains the ground and the 2 ledges we can jump on
         platforms = this.physics.add.staticGroup();
@@ -22,21 +22,29 @@ class MainScene extends Phaser.Scene {
         //  Here we create the ground.
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
-        // Adding trees as platforms you can jump on
+        // Adding trees as obstacles with improved collision
         for (let i = 0; i < 3; i++) {
             const treeX = Phaser.Math.Between(50, 750);
-            const treeY = 500;
-            const tree = platforms.create(treeX, treeY, 'tree');
-            tree.setScale(0.2).refreshBody();
+            const treeY = 545;
+            // This makes the tree visible, but won't be in the way of the player
+            this.add.image(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5, 1);
+            // Area where the smaller section of the tree can be interacted with by the player (where they can jump on it)
+            const treePlatform = this.physics.add.staticImage(treeX, treeY - 100, null).setSize(50, 20).refreshBody();
+            // Makes the block/platform for the tree invisible but still allows the player to interact with it
+            treePlatform.setVisible(false);
+            // Now adding the platform to the static group
+            platforms.add(treePlatform);
         }
 
-        
-        for (let i = 0; i < 2; i++) {
-            const ledgeX = Phaser.Math.Between(50, 750);
-            const ledgeY = Phaser.Math.Between(50, 400);
-            platforms.create(ledgeX, ledgeY, 'ground');
-        }
-        
+        // Improved ledge generation to prevent same-level placement
+        // ledgeOne
+        const firstX = Phaser.Math.Between(0, 750);
+        const firstY = Phaser.Math.Between(300, 400);
+        platforms.create(firstX, firstY, 'ground');
+        // ledgeTwo  
+        const secondX = Phaser.Math.Between(50, 750);
+        const secondY = Phaser.Math.Between(100, 250);
+        platforms.create(secondX, secondY, 'ground');
 
         // The player and its settings
         player = this.physics.add.sprite(100, 450, 'dude');
@@ -45,6 +53,8 @@ class MainScene extends Phaser.Scene {
         //  Player physics properties. Give the little guy a slight bounce.
         player.setBounce(0.2);
         player.setCollideWorldBounds(true);
+        // Fixed collision bounds for better collision detection
+        player.setSize(180, 200).setOffset(180, 20);
 
         //  Our player animations, turning, walking left and walking right.
         this.anims.create({
@@ -138,7 +148,7 @@ stars.children.iterate(function (child) {
             player.setVelocityY(-330);
         }
         // Example: Switch to next scene if player reaches right edge
-        if (player.x > 680) {
+        if (player.x > 770) {
             this.scene.start('SecondScene');
         }
     }
@@ -158,7 +168,7 @@ class SecondScene extends Phaser.Scene {
     }
     create() {
         //  A simple background for our game
-        this.add.image(400, 300, 'sky');
+        this.add.image(0, 0, 'sky');
 
         //  The platforms group contains the ground and the 2 ledges we can jump on
         platforms = this.physics.add.staticGroup();
@@ -167,20 +177,29 @@ class SecondScene extends Phaser.Scene {
         //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
         platforms.create(400, 568, 'ground').setScale(2).refreshBody();
 
-        // Adding trees as platforms you can jump on
+        // Adding trees as obstacles with improved collision
         for (let i = 0; i < 3; i++) {
             const treeX = Phaser.Math.Between(50, 750);
-            const treeY = 500;
-            const tree = platforms.create(treeX, treeY, 'tree');
-            tree.setScale(0.2).refreshBody();
+            const treeY = 545;
+            // This makes the tree visible, but won't be in the way of the player
+            this.add.image(treeX, treeY, 'tree').setScale(0.2).setOrigin(0.5, 1);
+            // Area where the smaller section of the tree can be interacted with by the player (where they can jump on it)
+            const treePlatform = this.physics.add.staticImage(treeX, treeY - 100, null).setSize(50, 20).refreshBody();
+            // Makes the block/platform for the tree invisible but still allows the player to interact with it
+            treePlatform.setVisible(false);
+            // Now adding the platform to the static group
+            platforms.add(treePlatform);
         }
 
-        //  Now let's create some ledges
-        for (let i = 0; i < 2; i++) {
-            const ledgeX = Phaser.Math.Between(50, 750);
-            const ledgeY = Phaser.Math.Between(50, 400);
-            platforms.create(ledgeX, ledgeY, 'ground');
-        }
+        // Improved ledge generation to prevent same-level placement
+        // ledgeOne
+        const firstX = Phaser.Math.Between(0, 750);
+        const firstY = Phaser.Math.Between(300, 400);
+        platforms.create(firstX, firstY, 'ground');
+        // ledgeTwo  
+        const secondX = Phaser.Math.Between(50, 750);
+        const secondY = Phaser.Math.Between(100, 250);
+        platforms.create(secondX, secondY, 'ground');
 
         // The player and its settings
         player = this.physics.add.sprite(100, 450, 'dude');
@@ -189,6 +208,8 @@ class SecondScene extends Phaser.Scene {
         //  Player physics properties. Give the little guy a slight bounce.
         player.setBounce(0.2);
         player.setCollideWorldBounds(true);
+        // Fixed collision bounds for better collision detection
+        player.setSize(180, 200).setOffset(180, 20);
 
         //  Our player animations, turning, walking left and walking right.
         this.anims.create({
@@ -280,7 +301,7 @@ stars.children.iterate(function (child) {
             player.setVelocityY(-330);
         }
         // Example: Switch to next scene if player reaches right edge
-        if (player.x > 680) {
+        if (player.x > 770) {
             this.scene.start('SecondScene', { score: score });
         }
     }
