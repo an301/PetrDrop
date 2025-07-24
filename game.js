@@ -1,5 +1,36 @@
 // PetrDrop Game - Main JavaScript File
 
+class StartScene extends Phaser.Scene {
+    constructor() {
+        super('StartScene');
+    }
+
+    preload() {
+        this.load.image('startBG', 'assets/startscene.png'); // You can change the image file name
+        //this.load.image('startButton', 'assets/start-button.png'); // Optional: or use text instead
+    }
+
+    create() {
+        // Add background image
+        const bg = this.add.image(0, 0, 'startBG').setOrigin(0, 0);
+        bg.displayWidth = this.sys.game.config.width;
+        bg.displayHeight = this.sys.game.config.height;
+
+        // Option 2 (if no image): use plain text as button
+         const startText = this.add.text(400, 500, 'START', { fontSize: '48px', fill: '#fff' }).setOrigin(0.5);
+         startText.setInteractive();
+         startText.on('pointerdown', () => {
+            // Fade out the current camera
+            this.cameras.main.fadeOut(500, 0, 0, 0); // duration 500ms, fade to black (RGB 0,0,0)
+
+            // After the fade completes, start the main scene
+            this.time.delayedCall(500, () => {
+                this.scene.start('MainScene');
+            });
+        });
+    }
+}
+
 class MainScene extends Phaser.Scene {
     constructor() {
         super('MainScene');
@@ -91,7 +122,6 @@ stars.children.iterate(function (child) {
     child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
     child.setScale(0.1);  // 👈 Add this line to shrink the star
 });
-
 
         bombs = this.physics.add.group();
 
@@ -314,7 +344,7 @@ var config = {
     height: 600,
     parent: 'game-container',
     physics: { default: 'arcade', arcade: { gravity: { y: 300 }, debug: false } },
-    scene: [MainScene, SecondScene]
+    scene: [StartScene, MainScene, SecondScene]
 };
 
 // Global variables
