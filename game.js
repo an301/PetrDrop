@@ -1,0 +1,545 @@
+// PetrDrop Game - Main JavaScript File
+
+class MainScene extends Phaser.Scene {
+    constructor() {
+        super('MainScene');
+    }
+    preload() {
+        this.load.image('sky', 'assets/background.png');
+        this.load.image('ground', 'assets/platform.png');
+        this.load.image('star', 'assets/petr.png');
+        this.load.image('bomb', 'assets/bomb.png');
+        this.load.image('tree', 'assets/tree.png');
+        this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 540, frameHeight: 216 });
+    }
+    create() {
+        //  A simple background for our game
+        this.add.image(400, 300, 'sky');
+
+        //  The platforms group contains the ground and the 2 ledges we can jump on
+        platforms = this.physics.add.staticGroup();
+
+        //  Here we create the ground.
+        platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+
+        // Adding trees as platforms you can jump on
+        for (let i = 0; i < 3; i++) {
+            const treeX = Phaser.Math.Between(50, 750);
+            const treeY = 500;
+            const tree = platforms.create(treeX, treeY, 'tree');
+            tree.setScale(0.2).refreshBody();
+        }
+
+        
+        for (let i = 0; i < 2; i++) {
+            const ledgeX = Phaser.Math.Between(50, 750);
+            const ledgeY = Phaser.Math.Between(50, 400);
+            platforms.create(ledgeX, ledgeY, 'ground');
+        }
+        
+
+        // The player and its settings
+        player = this.physics.add.sprite(100, 450, 'dude');
+        player.setScale(0.3);
+
+        //  Player physics properties. Give the little guy a slight bounce.
+        player.setBounce(0.2);
+        player.setCollideWorldBounds(true);
+
+        //  Our player animations, turning, walking left and walking right.
+        this.anims.create({
+            key: 'left',
+            frames: [{key: 'dude', frame: 0 }],
+            frameRate: 1,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'turn',
+            frames: [{key: 'dude', frame: 1 }],
+            frameRate: 1
+        });
+
+        this.anims.create({
+            key: 'right',
+            frames: [{key: 'dude', frame: 1 }],
+            frameRate: 1,
+            repeat: -1
+        });
+
+        //  Input Events
+        cursors = this.input.keyboard.createCursorKeys();
+
+        //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
+        stars = this.physics.add.group({
+    key: 'star',
+    repeat: 11,
+    setXY: { x: 12, y: 0, stepX: 70 }
+});
+
+stars.children.iterate(function (child) {
+    child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
+    child.setScale(0.1);  // 👈 Add this line to shrink the star
+});
+
+
+        bombs = this.physics.add.group();
+
+        //  The score
+        scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+        
+        //  The timer
+        timerText = this.add.text(config.width - 16, 16, 'Time: 0:00', { fontSize: '32px', fill: '#000' });
+        timerText.setOrigin(1, 0); // Right-align the timer
+        
+        // Initialize game timer
+        initializeTimer();
+
+        //  Collide the player and the stars with the platforms
+        this.physics.add.collider(player, platforms);
+        this.physics.add.collider(stars, platforms);
+        this.physics.add.collider(bombs, platforms);
+
+        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+        this.physics.add.overlap(player, stars, collectStar, null, this);
+
+        this.physics.add.collider(player, bombs, hitBomb, null, this);
+    }
+    update() {
+        if (gameOver)
+        {
+            return;
+        }
+
+        // Update timer
+        updateGameTimer();
+
+        if (cursors.left.isDown)
+        {
+            player.setVelocityX(-160);
+
+            player.anims.play('left', true);
+        }
+        else if (cursors.right.isDown)
+        {
+            player.setVelocityX(160);
+
+            player.anims.play('right', true);
+        }
+        else
+        {
+            player.setVelocityX(0);
+
+            player.anims.play('turn');
+        }
+
+        if (cursors.up.isDown && player.body.touching.down)
+        {
+            player.setVelocityY(-330);
+        }
+        // Example: Switch to next scene if player reaches right edge
+        if (player.x > 680) {
+            this.scene.start('SecondScene');
+        }
+    }
+}
+
+// New scene for the second page
+class SecondScene extends Phaser.Scene {
+    constructor() {
+        super('SecondScene');
+    }
+    preload() {
+        this.load.image('sky', 'assets/background.png');
+        this.load.image('ground', 'assets/platform.png');
+        this.load.image('star', 'assets/petr.png');
+        this.load.image('bomb', 'assets/bomb.png');
+        this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 540, frameHeight: 216 });
+    }
+    create() {
+        //  A simple background for our game
+        this.add.image(400, 300, 'sky');
+
+        //  The platforms group contains the ground and the 2 ledges we can jump on
+        platforms = this.physics.add.staticGroup();
+
+        //  Here we create the ground.
+        //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+        platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+
+        // Adding trees as platforms you can jump on
+        for (let i = 0; i < 3; i++) {
+            const treeX = Phaser.Math.Between(50, 750);
+            const treeY = 500;
+            const tree = platforms.create(treeX, treeY, 'tree');
+            tree.setScale(0.2).refreshBody();
+        }
+
+        //  Now let's create some ledges
+        for (let i = 0; i < 2; i++) {
+            const ledgeX = Phaser.Math.Between(50, 750);
+            const ledgeY = Phaser.Math.Between(50, 400);
+            platforms.create(ledgeX, ledgeY, 'ground');
+        }
+
+        // The player and its settings
+        player = this.physics.add.sprite(100, 450, 'dude');
+        player.setScale(0.3);
+
+        //  Player physics properties. Give the little guy a slight bounce.
+        player.setBounce(0.2);
+        player.setCollideWorldBounds(true);
+
+        //  Our player animations, turning, walking left and walking right.
+        this.anims.create({
+            key: 'left',
+            frames: [{key: 'dude', frame: 0 }],
+            frameRate: 1,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'turn',
+            frames: [{key: 'dude', frame: 1 }],
+            frameRate: 1
+        });
+
+        this.anims.create({
+            key: 'right',
+            frames: [{key: 'dude', frame: 1 }],
+            frameRate: 1,
+            repeat: -1
+        });
+
+        //  Input Events
+        cursors = this.input.keyboard.createCursorKeys();
+
+        //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
+        stars = this.physics.add.group({
+    key: 'star',
+    repeat: 11,
+    setXY: { x: 12, y: 0, stepX: 70 }
+});
+
+stars.children.iterate(function (child) {
+    child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
+    child.setScale(0.1);  // 👈 Add this line to shrink the star
+});
+
+
+        bombs = this.physics.add.group();
+
+        //  The score
+        scoreText = this.add.text(16, 16, 'score: ' + score, { fontSize: '32px', fill: '#000' });
+        
+        //  The timer
+        timerText = this.add.text(config.width - 16, 16, 'Time: ' + formatTime(gameTime), { fontSize: '32px', fill: '#000' });
+        timerText.setOrigin(1, 0); // Right-align the timer
+
+        //  Collide the player and the stars with the platforms
+        this.physics.add.collider(player, platforms);
+        this.physics.add.collider(stars, platforms);
+        this.physics.add.collider(bombs, platforms);
+        
+
+        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
+        this.physics.add.overlap(player, stars, collectStar, null, this);
+
+        this.physics.add.collider(player, bombs, hitBomb, null, this);
+    }
+    update() {
+        if (gameOver)
+        {
+            return;
+        }
+
+        // Update timer
+        updateGameTimer();
+
+        if (cursors.left.isDown)
+        {
+            player.setVelocityX(-160);
+
+            player.anims.play('left', true);
+        }
+        else if (cursors.right.isDown)
+        {
+            player.setVelocityX(160);
+
+            player.anims.play('right', true);
+        }
+        else
+        {
+            player.setVelocityX(0);
+
+            player.anims.play('turn');
+        }
+
+        if (cursors.up.isDown && player.body.touching.down)
+        {
+            player.setVelocityY(-330);
+        }
+        // Example: Switch to next scene if player reaches right edge
+        if (player.x > 680) {
+            this.scene.start('SecondScene', { score: score });
+        }
+    }
+}
+
+// Game configuration
+var config = {
+    type: Phaser.AUTO,
+    width: 800,
+    height: 600,
+    parent: 'game-container',
+    physics: { default: 'arcade', arcade: { gravity: { y: 300 }, debug: false } },
+    scene: [MainScene, SecondScene]
+};
+
+// Global variables
+var player;
+var stars;
+var bombs;
+var platforms;
+var cursors;
+var score = 0;
+var gameOver = false;
+var scoreText;
+var timerText;
+var gameTime = 0;
+var gameStartTime;
+
+// Collection tracking
+var collectedPetr = 0;
+var petrCollectionHistory = [];
+
+// Initialize the game
+var game = new Phaser.Game(config);
+
+// Timer functionality
+function initializeTimer() {
+    gameStartTime = Date.now();
+    gameTime = 0;
+}
+
+function updateGameTimer() {
+    if (!gameOver && gameStartTime) {
+        gameTime = Math.floor((Date.now() - gameStartTime) / 1000);
+        if (timerText) {
+            timerText.setText('Time: ' + formatTime(gameTime));
+        }
+    }
+}
+
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return minutes + ':' + remainingSeconds.toString().padStart(2, '0');
+}
+
+function resetTimer() {
+    gameTime = 0;
+    gameStartTime = Date.now();
+    if (timerText) {
+        timerText.setText('Time: 0:00');
+    }
+}
+
+// Menu and UI functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.getElementById('menu-toggle');
+    const menuContent = document.getElementById('menu-content');
+    const viewCollectionBtn = document.getElementById('view-collection-btn');
+    const pauseBtn = document.getElementById('pause-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const collectionModal = document.getElementById('collection-modal');
+    const closeCollection = document.getElementById('close-collection');
+    
+    let isMenuOpen = false;
+    let isGamePaused = false;
+
+    // Menu toggle functionality
+    menuToggle.addEventListener('click', function() {
+        isMenuOpen = !isMenuOpen;
+        if (isMenuOpen) {
+            menuContent.classList.remove('menu-hidden');
+            menuContent.classList.add('menu-visible');
+        } else {
+            menuContent.classList.remove('menu-visible');
+            menuContent.classList.add('menu-hidden');
+        }
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        if (!document.getElementById('menu-tab').contains(event.target) && isMenuOpen) {
+            isMenuOpen = false;
+            menuContent.classList.remove('menu-visible');
+            menuContent.classList.add('menu-hidden');
+        }
+    });
+
+    // View collection functionality
+    viewCollectionBtn.addEventListener('click', function() {
+        updateCollectionDisplay();
+        collectionModal.classList.remove('modal-hidden');
+        collectionModal.classList.add('modal-visible');
+        
+        // Close menu
+        isMenuOpen = false;
+        menuContent.classList.remove('menu-visible');
+        menuContent.classList.add('menu-hidden');
+    });
+
+    // Close collection modal
+    closeCollection.addEventListener('click', function() {
+        collectionModal.classList.remove('modal-visible');
+        collectionModal.classList.add('modal-hidden');
+    });
+
+    // Close modal when clicking outside
+    collectionModal.addEventListener('click', function(event) {
+        if (event.target === collectionModal) {
+            collectionModal.classList.remove('modal-visible');
+            collectionModal.classList.add('modal-hidden');
+        }
+    });
+
+    // Pause functionality
+    pauseBtn.addEventListener('click', function() {
+        if (!isGamePaused) {
+            game.scene.pause();
+            pauseBtn.textContent = '▶️ Resume';
+            isGamePaused = true;
+        } else {
+            game.scene.resume();
+            pauseBtn.textContent = '⏸️ Pause';
+            isGamePaused = false;
+        }
+        
+        // Close menu
+        isMenuOpen = false;
+        menuContent.classList.remove('menu-visible');
+        menuContent.classList.add('menu-hidden');
+    });
+
+    // Restart functionality
+    restartBtn.addEventListener('click', function() {
+        // Reset game state
+        score = 0;
+        collectedPetr = 0;
+        petrCollectionHistory = [];
+        gameOver = false;
+        
+        // Always restart from MainScene (beginning of the game)
+        // Stop all scenes and start fresh from MainScene
+        game.scene.stop('MainScene');
+        game.scene.stop('SecondScene');
+        
+        // Start MainScene fresh
+        setTimeout(() => {
+            game.scene.start('MainScene');
+            // Reset timer after scene starts
+            setTimeout(() => {
+                resetTimer();
+            }, 50);
+        }, 100);
+        
+        // Reset pause state
+        if (isGamePaused) {
+            pauseBtn.textContent = '⏸️ Pause';
+            isGamePaused = false;
+        }
+        
+        // Close menu
+        isMenuOpen = false;
+        menuContent.classList.remove('menu-visible');
+        menuContent.classList.add('menu-hidden');
+    });
+});
+
+// Update collection display
+function updateCollectionDisplay() {
+    const totalScoreEl = document.getElementById('total-score');
+    const petrCountEl = document.getElementById('petr-count');
+    const timePlayedEl = document.getElementById('time-played');
+    const petrBoxesEl = document.getElementById('petr-boxes');
+    
+    totalScoreEl.textContent = score;
+    petrCountEl.textContent = collectedPetr;
+    timePlayedEl.textContent = formatTime(gameTime);
+    
+    // Clear and rebuild petr boxes
+    petrBoxesEl.innerHTML = '';
+    
+    for (let i = 0; i < collectedPetr; i++) {
+        const petrBox = document.createElement('div');
+        petrBox.className = 'petr-box';
+        
+        // Create the Petr image element
+        const petrImage = document.createElement('div');
+        petrImage.className = 'petr-image';
+        
+        const petrNumber = document.createElement('div');
+        petrNumber.className = 'petr-number';
+        petrNumber.textContent = i + 1;
+        
+        petrBox.appendChild(petrImage);
+        petrBox.appendChild(petrNumber);
+        petrBoxesEl.appendChild(petrBox);
+    }
+}
+
+// Function to add collected Petr to the collection
+function addPetrToCollection() {
+    collectedPetr++;
+    const timestamp = new Date().toISOString();
+    petrCollectionHistory.push({
+        id: collectedPetr,
+        timestamp: timestamp,
+        score: score
+    });
+}
+
+// Game functions
+function collectStar (player, star)
+{
+    star.disableBody(true, true);
+
+    //  Add to collection tracking
+    addPetrToCollection();
+
+    //  Add and update the score
+    score += 10;
+    scoreText.setText('Score: ' + score);
+
+    if (stars.countActive(true) === 0)
+    {
+        //  A new batch of stars to collect
+        stars.children.iterate(function (child) {
+
+            child.enableBody(true, child.x, 0, true, true);
+
+        });
+
+        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+
+        var bomb = bombs.create(x, 16, 'bomb');
+        bomb.setBounce(1);
+        bomb.setCollideWorldBounds(true);
+        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+        bomb.allowGravity = false;
+
+    }
+}
+
+function hitBomb (player, bomb)
+{
+    this.physics.pause();
+
+    player.setTint(0xff0000);
+
+    player.anims.play('turn');
+
+    gameOver = true;
+}
