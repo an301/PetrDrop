@@ -38,7 +38,7 @@ class MainScene extends Phaser.Scene {
     preload() {
         this.load.image('sky', 'assets/background.png');
         this.load.image('ground', 'assets/platform.png');
-        this.load.image('star', 'assets/petr.png');
+        this.load.image('petr', 'assets/petr.png');
         this.load.image('enemy', 'assets/enemy.png');
         this.load.image('tree', 'assets/tree.png');
         this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 540, frameHeight: 216 });
@@ -111,16 +111,16 @@ class MainScene extends Phaser.Scene {
         //  Input Events
         cursors = this.input.keyboard.createCursorKeys();
 
-        //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
-        stars = this.physics.add.group({
-    key: 'star',
+        //  Some petrs to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
+        petrs = this.physics.add.group({
+    key: 'petr',
     repeat: 11,
     setXY: { x: 12, y: 0, stepX: 70 }
 });
 
-stars.children.iterate(function (child) {
+petrs.children.iterate(function (child) {
     child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
-    child.setScale(0.1);  // 👈 Add this line to shrink the star
+    child.setScale(0.1);  // 👈 Add this line to shrink the petr
 });
 
         enemies = this.physics.add.group();
@@ -135,13 +135,13 @@ stars.children.iterate(function (child) {
         // Initialize game timer
         initializeTimer();
 
-        //  Collide the player and the stars with the platforms
+        //  Collide the player and the petrs with the platforms
         this.physics.add.collider(player, platforms);
-        this.physics.add.collider(stars, platforms);
+        this.physics.add.collider(petrs, platforms);
         this.physics.add.collider(enemies, platforms);
 
-        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-        this.physics.add.overlap(player, stars, collectStar, null, this);
+        //  Checks to see if the player overlaps with any of the petrs, if he does call the collectStar function
+        this.physics.add.overlap(player, petrs, collectStar, null, this);
 
         this.physics.add.collider(player, enemies, hitEnemy, null, this);
     }
@@ -192,7 +192,7 @@ class SecondScene extends Phaser.Scene {
     preload() {
         this.load.image('sky', 'assets/background.png');
         this.load.image('ground', 'assets/platform.png');
-        this.load.image('star', 'assets/petr.png');
+        this.load.image('petr', 'assets/petr.png');
         this.load.image('enemy', 'assets/enemy.png');
         this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 540, frameHeight: 216 });
     }
@@ -265,16 +265,16 @@ class SecondScene extends Phaser.Scene {
         //  Input Events
         cursors = this.input.keyboard.createCursorKeys();
 
-        //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
-        stars = this.physics.add.group({
-    key: 'star',
+        //  Some petrs to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
+        petrs = this.physics.add.group({
+    key: 'petr',
     repeat: 11,
     setXY: { x: 12, y: 0, stepX: 70 }
 });
 
-stars.children.iterate(function (child) {
+petrs.children.iterate(function (child) {
     child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
-    child.setScale(0.1);  // 👈 Add this line to shrink the star
+    child.setScale(0.1);  // 👈 Add this line to shrink the petr
 });
 
 
@@ -287,14 +287,14 @@ stars.children.iterate(function (child) {
         timerText = this.add.text(config.width - 16, 16, 'Time: ' + formatTime(gameTime), { fontSize: '32px', fill: '#000' });
         timerText.setOrigin(1, 0); // Right-align the timer
 
-        //  Collide the player and the stars with the platforms
+        //  Collide the player and the petrs with the platforms
         this.physics.add.collider(player, platforms);
-        this.physics.add.collider(stars, platforms);
+        this.physics.add.collider(petrs, platforms);
         this.physics.add.collider(enemies, platforms);
         
 
-        //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-        this.physics.add.overlap(player, stars, collectStar, null, this);
+        //  Checks to see if the player overlaps with any of the petrs, if he does call the collectStar function
+        this.physics.add.overlap(player, petrs, collectStar, null, this);
 
         this.physics.add.collider(player, enemies, hitEnemy, null, this);
     }
@@ -349,7 +349,7 @@ var config = {
 
 // Global variables
 var player;
-var stars;
+var petrs;
 var enemies;
 var platforms;
 var cursors;
@@ -536,9 +536,9 @@ function addPetrToCollection() {
 }
 
 // Game functions
-function collectStar (player, star)
+function collectStar (player, petr)
 {
-    star.disableBody(true, true);
+    petr.disableBody(true, true);
 
     //  Add to collection tracking
     addPetrToCollection();
@@ -548,11 +548,11 @@ function collectStar (player, star)
     scoreEnemy += 10;
     scoreText.setText('Score: ' + score);
 
-    if (scoreEnemy == 100)//(stars.countActive(true) === 0)
+    if (scoreEnemy == 100)//(petrs.countActive(true) === 0)
     {
         scoreEnemy = 0;
-        //  A new batch of stars to collect
-        stars.children.iterate(function (child) {
+        //  A new batch of petrs to collect
+        petrs.children.iterate(function (child) {
 
             child.enableBody(true, child.x, 0, true, true);
 
