@@ -155,7 +155,7 @@ class MainScene extends Phaser.Scene {
         typePetr = "rare_one";
       } else if (chance < 0.18) {
         typePetr = "rare_two";
-      } else if (chance < 0.18) {
+      } else if (chance < 0.181) {
         typePetr = "rare_three";
       }
 
@@ -356,7 +356,7 @@ class SecondScene extends Phaser.Scene {
         typePetr = "rare_one";
       } else if (chance < 0.18) {
         typePetr = "rare_two";
-      } else if (chance < 0.18) {
+      } else if (chance < 0.181) {
         typePetr = "rare_three";
       }
 
@@ -458,8 +458,31 @@ var completionTime = null; // Track when player reaches 500 points
 var collectedPetr = 0;
 var petrCollectionHistory = [];
 
+// Load existing collection from localStorage on game start
+function loadCollectionFromStorage() {
+  const savedCollection = localStorage.getItem('petrCollectionHistory');
+  if (savedCollection) {
+    try {
+      petrCollectionHistory = JSON.parse(savedCollection);
+      collectedPetr = petrCollectionHistory.length;
+    } catch (e) {
+      console.log('Error loading collection history:', e);
+      petrCollectionHistory = [];
+      collectedPetr = 0;
+    }
+  }
+}
+
+// Save collection to localStorage
+function saveCollectionToStorage() {
+  localStorage.setItem('petrCollectionHistory', JSON.stringify(petrCollectionHistory));
+}
+
 // Initialize the game
 var game = new Phaser.Game(config);
+
+// Load existing collection history when game starts
+loadCollectionFromStorage();
 
 // Timer functionality
 function initializeTimer() {
@@ -567,11 +590,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Restart functionality
   restartBtn.addEventListener("click", function () {
-    // Reset game state
+    // Reset game state but preserve collection history
     score = 0;
-    collectedPetr = 0;
-    petrCollectionHistory = [];
     gameOver = false;
+    // Don't reset collectedPetr or petrCollectionHistory - these should persist
 
     // Always restart from MainScene (beginning of the game)
     // Stop all scenes and start fresh from MainScene
@@ -654,6 +676,8 @@ function addPetrToCollection(type = "star") {
     timestamp: timestamp,
     score: score,
   });
+  // Save to localStorage immediately when collected
+  saveCollectionToStorage();
 }
 
 // Game functions
