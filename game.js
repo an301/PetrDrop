@@ -123,15 +123,6 @@ class MainScene extends Phaser.Scene {
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
 
-    /*
-    //  Some stars to collect, 8 in total, evenly spaced 90 pixels apart along the x axis
-    stars = this.physics.add.group({
-      key: "star",
-      repeat: 7,
-      setXY: { x: 40, y: 0, stepX: 100 },
-    });
-    */
-
     // to generate also rare petrs
     const starTypes = ["star", "rare_one", "rare_two", "rare_three"];
     stars = this.physics.add.group();
@@ -317,20 +308,6 @@ class SecondScene extends Phaser.Scene {
 
     //  Input Events
     cursors = this.input.keyboard.createCursorKeys();
-
-    /*
-    //  Some stars to collect, 8 in total, evenly spaced 90 pixels apart along the x axis
-    stars = this.physics.add.group({
-      key: "star",
-      repeat: 7,
-      setXY: { x: 40, y: 0, stepX: 100 },
-    });
-
-    stars.children.iterate(function (child) {
-      child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
-      child.setScale(0.1); // 👈 Add this line to shrink the star
-    });
-    */
 
     // to generate also rare petrs
     const starTypes = ["star", "rare_one", "rare_two", "rare_three"];
@@ -606,24 +583,6 @@ function updateCollectionDisplay() {
   // Clear and rebuild petr boxes
   petrBoxesEl.innerHTML = "";
 
-    /*
-  for (let i = 0; i < collectedPetr; i++) {
-    const petrBox = document.createElement("div");
-    petrBox.className = "petr-box";
-
-    // Create the Petr image element
-    const petrImage = document.createElement("div");
-    petrImage.className = "petr-image";
-
-    const petrNumber = document.createElement("div");
-    petrNumber.className = "petr-number";
-    petrNumber.textContent = i + 1;
-
-    petrBox.appendChild(petrImage);
-    petrBox.appendChild(petrNumber);
-    petrBoxesEl.appendChild(petrBox);
-  }
-  */
 petrCollectionHistory.forEach((petr, i) => {
   const petrBox = document.createElement("div");
   petrBox.className = "petr-box";
@@ -704,7 +663,7 @@ function collectStar(player, star) {
     return;
   }
 
-  if (scoreEnemy == 100) {
+  if (scoreEnemy >= 100) {
     //  A new batch of stars to collect
     scoreEnemy = 0;
 
