@@ -127,31 +127,48 @@ class MainScene extends Phaser.Scene {
     const starTypes = ["star", "rare_one", "rare_two", "rare_three"];
     stars = this.physics.add.group();
 
-    for (let i = 0; i < 8; i++){
-      const x = Phaser.Math.Between(50, 750);
+    // keeping track of used positioning 
+    const usedXPositions = [];
+    const minSpacing = 60; // Adjust as needed
+
+    for (let i = 0; i < 8; i++) {
+      let x;
+      let attempts = 0;
+
+      // Try to find a position that doesn't overlap
+      do {
+        x = Phaser.Math.Between(50, 750);
+        attempts++;
+        // while loop so that there's spacing between petrs
+      } while (
+        usedXPositions.some((prevX) => Math.abs(prevX - x) < minSpacing) &&
+        attempts < 100
+      );
+
+      usedXPositions.push(x);
+
       const y = 0;
 
-      let typePetr = "star"; // default is the common petr
-      
-      const chance = Phaser.Math.FloatBetween(0,1);
-      if (chance < 0.15){
+      let typePetr = "star";
+      const chance = Phaser.Math.FloatBetween(0, 1);
+      if (chance < 0.15) {
         typePetr = "rare_one";
-      } else if (chance < 0.18){
+      } else if (chance < 0.18) {
         typePetr = "rare_two";
-      } else if (chance < 0.18){
+      } else if (chance < 0.18) {
         typePetr = "rare_three";
       }
 
       const selectedPetr = stars.create(x, y, typePetr);
-      selectedPetr.setBounceY(Phaser.Math.FloatBetween(0.2,0.4));
-      if (typePetr == "star"){
+      selectedPetr.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
+
+      if (typePetr === "star") {
         selectedPetr.setScale(0.1);
-      } else if (typePetr == "rare_one") {
-        selectedPetr.setScale(0.15);
       } else {
         selectedPetr.setScale(0.15);
       }
     }
+
 
     // stars.children.iterate(function (child) {
     //   child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
@@ -313,27 +330,41 @@ class SecondScene extends Phaser.Scene {
     const starTypes = ["star", "rare_one", "rare_two", "rare_three"];
     stars = this.physics.add.group();
 
-    for (let i = 0; i < 8; i++){
-      const x = Phaser.Math.Between(50, 750);
+    const usedXPositions = [];
+    const minSpacing = 60; // Adjust as needed
+
+    for (let i = 0; i < 8; i++) {
+      let x;
+      let attempts = 0;
+
+      // Try to find a position that doesn't overlap
+      do {
+        x = Phaser.Math.Between(50, 750);
+        attempts++;
+      } while (
+        usedXPositions.some((prevX) => Math.abs(prevX - x) < minSpacing) &&
+        attempts < 100
+      );
+
+      usedXPositions.push(x);
+
       const y = 0;
 
-      let typePetr = "star"; // default is the common petr
-      
-      const chance = Phaser.Math.FloatBetween(0,1);
-      if (chance < 0.15){
+      let typePetr = "star";
+      const chance = Phaser.Math.FloatBetween(0, 1);
+      if (chance < 0.15) {
         typePetr = "rare_one";
-      } else if (chance < 0.18){
+      } else if (chance < 0.18) {
         typePetr = "rare_two";
-      } else if (chance < 0.18){
+      } else if (chance < 0.18) {
         typePetr = "rare_three";
       }
 
       const selectedPetr = stars.create(x, y, typePetr);
-      selectedPetr.setBounceY(Phaser.Math.FloatBetween(0.2,0.4));
-      if (typePetr == "star"){
+      selectedPetr.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
+
+      if (typePetr === "star") {
         selectedPetr.setScale(0.1);
-      } else if (typePetr == "rare_one") {
-        selectedPetr.setScale(0.15);
       } else {
         selectedPetr.setScale(0.15);
       }
