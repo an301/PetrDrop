@@ -606,6 +606,7 @@ function updateCollectionDisplay() {
   // Clear and rebuild petr boxes
   petrBoxesEl.innerHTML = "";
 
+    /*
   for (let i = 0; i < collectedPetr; i++) {
     const petrBox = document.createElement("div");
     petrBox.className = "petr-box";
@@ -622,14 +623,44 @@ function updateCollectionDisplay() {
     petrBox.appendChild(petrNumber);
     petrBoxesEl.appendChild(petrBox);
   }
+  */
+petrCollectionHistory.forEach((petr, i) => {
+  const petrBox = document.createElement("div");
+  petrBox.className = "petr-box";
+
+  const petrImage = document.createElement("img");
+  petrImage.className = "petr-image";
+
+  // Set image source based on Petr type
+  if (petr.type === "rare_one") {
+    petrImage.src = "assets/bobapetr.png";
+  } else if (petr.type === "rare_two") {
+    petrImage.src = "assets/pickleballpetr.png";
+  } else if (petr.type === "rare_three") {
+    petrImage.src = "assets/schoolspiritpetr.png";
+  } else {
+    petrImage.src = "assets/petr.png"; // common
+  }
+
+  const petrNumber = document.createElement("div");
+  petrNumber.className = "petr-number";
+  petrNumber.textContent = i + 1;
+
+  petrBox.appendChild(petrImage);
+  petrBox.appendChild(petrNumber);
+  petrBoxesEl.appendChild(petrBox);
+  });
+
 }
 
 // Function to add collected Petr to the collection
-function addPetrToCollection() {
+// added the petr type as a parameter
+function addPetrToCollection(type = "star") {
   collectedPetr++;
   const timestamp = new Date().toISOString();
   petrCollectionHistory.push({
     id: collectedPetr,
+    type: type, //account for the kind of petr it currently is
     timestamp: timestamp,
     score: score,
   });
@@ -641,7 +672,7 @@ function collectStar(player, star) {
   star.disableBody(true, true);
 
   //  Add to collection tracking
-  addPetrToCollection();
+  addPetrToCollection(star.texture.key);
 
   // default
   let points = 10;
