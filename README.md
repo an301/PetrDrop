@@ -78,7 +78,6 @@ PetrDrop/
 - Add lives/health mechanic
 - Add a final win screen or boss level
 - Implement power-ups
-- Add more petr types
 - Add more backgrounds and character customization
 
 ---
