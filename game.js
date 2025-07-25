@@ -6,26 +6,24 @@ class StartScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("startBG", "assets/startscene.png"); // You can change the image file name
-    //this.load.image('startButton', 'assets/start-button.png'); // Optional: or use text instead
+    this.load.image("startBG", "assets/startscene.png"); // background start picture
   }
 
   create() {
-    // Add background image
+    // background image
     const bg = this.add.image(0, 0, "startBG").setOrigin(0, 0);
     bg.displayWidth = this.sys.game.config.width;
     bg.displayHeight = this.sys.game.config.height;
 
-    // Option 2 (if no image): use plain text as button
     const startText = this.add
       .text(400, 500, "START", { fontSize: "48px", fill: "#fff" })
       .setOrigin(0.5);
     startText.setInteractive();
     startText.on("pointerdown", () => {
-      // Fade out the current camera
+      // fade out the current camera
       this.cameras.main.fadeOut(500, 0, 0, 0); // duration 500ms, fade to black (RGB 0,0,0)
 
-      // After the fade completes, start the main scene
+      // start the main scene
       this.time.delayedCall(500, () => {
         this.scene.start("MainScene");
       });
@@ -38,9 +36,9 @@ class MainScene extends Phaser.Scene {
     super("MainScene");
   }
   preload() {
-    this.load.image("sky", "assets/background.png");
+    this.load.image("background", "assets/background.png");
     this.load.image("ground", "assets/platform.png");
-    this.load.image("star", "assets/petr.png");
+    this.load.image("petr", "assets/petr.png");
     // rare petrs
     this.load.image("rare_one", "assets/bobapetr.png");
     this.load.image("rare_two", "assets/pickleballpetr.png");
@@ -53,13 +51,11 @@ class MainScene extends Phaser.Scene {
     });
   }
   create() {
-    //  A simple background for our game
-    this.add.image(0, 0, "sky");
+    //  simple background for our game
+    this.add.image(0, 0, "background");
 
-    //  The platforms group contains the ground and the 2 ledges we can jump on
+    //  the platforms group contains the ground and the 2 ledges we can jump on
     platforms = this.physics.add.staticGroup();
-
-    //  Here we create the ground.
     platforms.create(400, 568, "ground").setScale(2).refreshBody();
 
     // Adding trees as obstacles with improved collision
@@ -93,7 +89,6 @@ class MainScene extends Phaser.Scene {
     player = this.physics.add.sprite(100, 450, "dude");
     player.setScale(0.3);
 
-    //  Player physics properties. Give the little guy a slight bounce.
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
     // Fixed collision bounds for better collision detection
@@ -124,8 +119,8 @@ class MainScene extends Phaser.Scene {
     cursors = this.input.keyboard.createCursorKeys();
 
     // to generate also rare petrs
-    const starTypes = ["star", "rare_one", "rare_two", "rare_three"];
-    stars = this.physics.add.group();
+    const starTypes = ["petr", "rare_one", "rare_two", "rare_three"];
+    petrs = this.physics.add.group();
 
     // keeping track of used positioning 
     const usedXPositions = [];
@@ -149,7 +144,7 @@ class MainScene extends Phaser.Scene {
 
       const y = 0;
 
-      let typePetr = "star";
+      let typePetr = "petr";
       const chance = Phaser.Math.FloatBetween(0, 1);
       if (chance < 0.15) {
         typePetr = "rare_one";
@@ -159,10 +154,10 @@ class MainScene extends Phaser.Scene {
         typePetr = "rare_three";
       }
 
-      const selectedPetr = stars.create(x, y, typePetr);
+      const selectedPetr = petrs.create(x, y, typePetr);
       selectedPetr.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
 
-      if (typePetr === "star") {
+      if (typePetr === "petr") {
         selectedPetr.setScale(0.1);
       } else {
         selectedPetr.setScale(0.15);
@@ -170,9 +165,9 @@ class MainScene extends Phaser.Scene {
     }
 
 
-    // stars.children.iterate(function (child) {
+    // petrs.children.iterate(function (child) {
     //   child.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
-    //   child.setScale(0.1); // 👈 Add this line to shrink the star
+    //   child.setScale(0.1); // 👈 Add this line to shrink the petr
     // });
 
     enemies = this.physics.add.group();
@@ -193,13 +188,13 @@ class MainScene extends Phaser.Scene {
     // Initialize game timer
     initializeTimer();
 
-    //  Collide the player and the stars with the platforms
+    //  Collide the player and the petrs with the platforms
     this.physics.add.collider(player, platforms);
-    this.physics.add.collider(stars, platforms);
+    this.physics.add.collider(petrs, platforms);
     this.physics.add.collider(enemies, platforms);
 
-    //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    this.physics.add.overlap(player, stars, collectStar, null, this);
+    //  Checks to see if the player overlaps with any of the petrs, if he does call the collectPetr function
+    this.physics.add.overlap(player, petrs, collectPetr, null, this);
 
     this.physics.add.collider(player, enemies, hitEnemy, null, this);
   }
@@ -241,9 +236,9 @@ class SecondScene extends Phaser.Scene {
     super("SecondScene");
   }
   preload() {
-    this.load.image("sky", "assets/background.png");
+    this.load.image("background", "assets/background.png");
     this.load.image("ground", "assets/platform.png");
-    this.load.image("star", "assets/petr.png");
+    this.load.image("petr", "assets/petr.png");
     // rare petrs
     this.load.image("rare_one", "assets/bobapetr.png");
     this.load.image("rare_two", "assets/pickleballpetr.png");
@@ -255,14 +250,10 @@ class SecondScene extends Phaser.Scene {
     });
   }
   create() {
-    //  A simple background for our game
-    this.add.image(0, 0, "sky");
+    this.add.image(0, 0, "background");
 
-    //  The platforms group contains the ground and the 2 ledges we can jump on
+    //  platforms for the next scene
     platforms = this.physics.add.staticGroup();
-
-    //  Here we create the ground.
-    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
     platforms.create(400, 568, "ground").setScale(2).refreshBody();
 
     // Adding trees as obstacles with improved collision
@@ -296,7 +287,6 @@ class SecondScene extends Phaser.Scene {
     player = this.physics.add.sprite(100, 450, "dude");
     player.setScale(0.3);
 
-    //  Player physics properties. Give the little guy a slight bounce.
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
     // Fixed collision bounds for better collision detection
@@ -327,8 +317,8 @@ class SecondScene extends Phaser.Scene {
     cursors = this.input.keyboard.createCursorKeys();
 
     // to generate also rare petrs
-    const starTypes = ["star", "rare_one", "rare_two", "rare_three"];
-    stars = this.physics.add.group();
+    const starTypes = ["petr", "rare_one", "rare_two", "rare_three"];
+    petrs = this.physics.add.group();
 
     const usedXPositions = [];
     const minSpacing = 60; // Adjust as needed
@@ -350,7 +340,7 @@ class SecondScene extends Phaser.Scene {
 
       const y = 0;
 
-      let typePetr = "star";
+      let typePetr = "petr";
       const chance = Phaser.Math.FloatBetween(0, 1);
       if (chance < 0.15) {
         typePetr = "rare_one";
@@ -360,10 +350,10 @@ class SecondScene extends Phaser.Scene {
         typePetr = "rare_three";
       }
 
-      const selectedPetr = stars.create(x, y, typePetr);
+      const selectedPetr = petrs.create(x, y, typePetr);
       selectedPetr.setBounceY(Phaser.Math.FloatBetween(0.2, 0.4));
 
-      if (typePetr === "star") {
+      if (typePetr === "petr") {
         selectedPetr.setScale(0.1);
       } else {
         selectedPetr.setScale(0.15);
@@ -387,13 +377,13 @@ class SecondScene extends Phaser.Scene {
     );
     timerText.setOrigin(1, 0); // Right-align the timer
 
-    //  Collide the player and the stars with the platforms
+    //  Collide the player and the petrs with the platforms
     this.physics.add.collider(player, platforms);
-    this.physics.add.collider(stars, platforms);
+    this.physics.add.collider(petrs, platforms);
     this.physics.add.collider(enemies, platforms);
 
-    //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    this.physics.add.overlap(player, stars, collectStar, null, this);
+    //  Checks to see if the player overlaps with any of the petrs, if he does call the collectPetr function
+    this.physics.add.overlap(player, petrs, collectPetr, null, this);
 
     this.physics.add.collider(player, enemies, hitEnemy, null, this);
   }
@@ -441,7 +431,7 @@ var config = {
 
 // Global variables
 var player;
-var stars;
+var petrs;
 var enemies;
 var platforms;
 var cursors;
@@ -645,7 +635,7 @@ petrCollectionHistory.forEach((petr, i) => {
 
 // Function to add collected Petr to the collection
 // added the petr type as a parameter
-function addPetrToCollection(type = "star") {
+function addPetrToCollection(type = "petr") {
   collectedPetr++;
   const timestamp = new Date().toISOString();
   petrCollectionHistory.push({
@@ -657,12 +647,12 @@ function addPetrToCollection(type = "star") {
 }
 
 // Game functions
-function collectStar(player, star) {
-  const type = star.texture.key;
-  star.disableBody(true, true);
+function collectPetr(player, petr) {
+  const type = petr.texture.key;
+  petr.disableBody(true, true);
 
   //  Add to collection tracking
-  addPetrToCollection(star.texture.key);
+  addPetrToCollection(petr.texture.key);
 
   // default
   let points = 10;
@@ -695,10 +685,10 @@ function collectStar(player, star) {
   }
 
   if (scoreEnemy >= 100) {
-    //  A new batch of stars to collect
+    //  A new batch of petrs to collect
     scoreEnemy = 0;
 
-    stars.children.iterate(function (child) {
+    petrs.children.iterate(function (child) {
       child.enableBody(true, child.x, 0, true, true);
     });
 
