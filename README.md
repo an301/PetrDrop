@@ -44,14 +44,18 @@ PetrDrop/
 │ ├── index.html # Entry point of the game
 ├── assets/ # Game assets: images, sprites, backgrounds
 │ ├── background.png
+│ ├── bobapetr.png
 │ ├── platform.png
 │ ├── tree.png
 │ ├── petr.png
+│ ├── pickleballpetr.png
+│ ├── platform.png
 │ ├── enemy.png
 │ ├── dude.png
 │ ├── sprite_left.png
 │ ├── sprite_right.png
 │ └── startscene.png
+│ ├── schoolspiritpetr.png
 ├── public/ # Assets used outside main game scenes
 │ └── win_petr.png # Image shown in win screen or collection
 
